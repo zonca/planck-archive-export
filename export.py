@@ -14,9 +14,10 @@ lfi = LFI()
 base_folder = "/project/projectdirs/planck/data/mission/lfi_ops_dx10/"
 freq = 70
 
-for od in range(91, 1604+1):
-    matching_files = glob(base_folder + "%04d/*%03d*-R-*.fits" % (od, freq)) 
-    assert len(matching_files) == 1, "More than one file for OD %d, freq %d" % (od, freq)
+for od in range(700, 1604+1):
+    print "*" * 30 + str(od) + "*" * 30
+    matching_files = glob(base_folder + "%04d/?%03d-*-R-*.fits" % (od, freq)) 
+    assert len(matching_files) == 1, "More than one file for OD %d, freq %d, %s" % (od, freq, str(matching_files))
     fits_file = pyfits.open(matching_files[0])
     pointing_fits_file = pyfits.open(matching_files[0])
     pnt = DiskPointing(od, freq)
