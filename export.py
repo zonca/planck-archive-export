@@ -8,6 +8,7 @@ import healpy as hp
 from planck.LFI import LFI
 from testenv.todtools import check_bit
 from planck.pointing import DiskPointing
+from planck.metadata import obt2utc
 
 lfi = LFI()
 
@@ -42,9 +43,8 @@ for od in range(700, 1604+1):
                                             })
 
             # timing
-            # TODO use UTC instead of OBT
             data["od"] = od
-            data["utc"] = fits_file["OBT"].data["OBT"][good_data]/2**16
+            data["utc"] = obt2utc(fits_file["OBT"].data["OBT"][good_data]/2**16)
             data["ring"] = 0
 
             # pointing
