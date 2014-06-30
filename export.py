@@ -40,7 +40,6 @@ def export_od(od, freq):
     matching_files = glob(base_folder + "%04d/?%03d-*-R-*.fits" % (od, freq)) 
     assert len(matching_files) == 1, "More than one file for OD %d, freq %d, %s" % (od, freq, str(matching_files))
     fits_file = pyfits.open(matching_files[0])
-    pointing_fits_file = pyfits.open(matching_files[0])
     pnt = DiskPointing(od, freq)
 
     fields = ['od', 'ring', 'glon', 'glat', 'psi', 'healpix_2048', 'tsky', 'dipole', 'utc']
