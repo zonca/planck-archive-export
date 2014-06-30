@@ -56,7 +56,14 @@ def export_od(od, freq):
     
         with h5py.File(output_folder + output_filename, 'w') as output_h5:
             print ch
-            good_data = np.logical_not((fits_file[ch.tag].data["FLAG"] > 0) | check_bit(fits_file["OBT"].data['FLAG'], 0) | check_bit(fits_file["OBT"].data['FLAG'], 2)| check_bit(fits_file["OBT"].data['FLAG'], 3)| check_bit(fits_file["OBT"].data['FLAG'], 4))
+            good_data = np.logical_not(
+                check_bit(fits_file[ch.tag].data['FLAG'], 0) | \
+                check_bit(fits_file[ch.tag].data['FLAG'], 2) | \
+                check_bit(fits_file[ch.tag].data['FLAG'], 4) | \
+                check_bit(fits_file["OBT"].data['FLAG'], 0)  | \
+                check_bit(fits_file["OBT"].data['FLAG'], 2)  | \
+                check_bit(fits_file["OBT"].data['FLAG'], 4)
+            )
             n_good_data = good_data.sum()
     
             data=np.zeros(n_good_data,dtype={
@@ -93,8 +100,9 @@ def export_od(od, freq):
             data['tsky'] = madam_baselines.baseline_remove(obt, fits_file[ch.tag].data[ch.tag][good_data], ch.tag)
             output_h5.create_dataset("%03d-%s" % (freq, ch), data=data, compression='lzf')
 
-            # TODO: Add actual solar system object flag?
-            data['sso']=0
+            # solar system object flag
+            data['sso'] = check_bit(fits_file["OBT"].data['FLAG'], 3)  | \
+                          check_bit(fits_file[ch.tag].data["FLAG"], 3)
     
             print "attributes"
             output_h5.attrs['PROCVER']  = 'DX11D'
