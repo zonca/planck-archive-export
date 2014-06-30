@@ -56,7 +56,7 @@ def export_od(od, freq):
     
         with h5py.File(output_folder + output_filename, 'w') as output_h5:
             print ch
-            good_data = np.logical_or(~check_bit(fits_file["OBT"].data["FLAG"], 0), fits_file[ch.tag].data["FLAG"]==0) 
+            good_data = np.logical_not((fits_file[ch.tag].data["FLAG"] > 0) | check_bit(fits_file["OBT"].data['FLAG'], 0) | check_bit(fits_file["OBT"].data['FLAG'], 2)| check_bit(fits_file["OBT"].data['FLAG'], 3)| check_bit(fits_file["OBT"].data['FLAG'], 4))
             n_good_data = good_data.sum()
     
             data=np.zeros(n_good_data,dtype={
