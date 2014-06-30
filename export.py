@@ -88,7 +88,7 @@ for od in range(91, 269+1):
             output_h5.attrs['TELESCOP'] = 'PLANCK'
             output_h5.attrs['INSTRUME'] = 'LFI'
             output_h5.attrs['DETNAM']   = ch
-            output_h5.attrs['FREQ']     = str(freq).zfill(3)
+            output_h5.attrs['FREQ']     = "%03d" % freq
             output_h5.attrs['OBJECT']   = 'MISSION OPERATIONAL DAY '+str(od)
             output_h5.attrs['FILENAME'] = output_filename
             output_h5.attrs['TIMEZERO'] = '1958-01-01z00:00'
