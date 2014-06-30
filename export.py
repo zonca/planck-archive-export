@@ -42,7 +42,7 @@ def export_od(od, freq):
     fits_file = pyfits.open(matching_files[0])
     pnt = DiskPointing(od, freq)
 
-    fields = ['od', 'ring', 'glon', 'glat', 'psi', 'healpix_2048', 'tsky', 'dipole', 'utc']
+    fields = ['od', 'ring', 'glon', 'glat', 'psi', 'healpix_1024', 'tsky', 'dipole', 'utc']
 
     from dipole import Dipole
     dip = Dipole(obt=fits_file["OBT"].data["OBT"]/2**16, type="total") 
