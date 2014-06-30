@@ -14,18 +14,15 @@ class MadamBaselines(object):
     """MadamBaselines class
 
     Loads madam fits baselines and removes them from data"""
-
     def __init__(self, filename):
         self.filename = filename
         with pyfits.open(self.filename) as f:
             self.baselines_obt = np.array(f[1].data["time"]).flatten()
-
     def get_baselines(self, chtag):
         with pyfits.open(self.filename) as f:
             # need to remove white spaces from name
             detector_index = [cht.strip() for cht in np.array(f[2].data["detector"])].index(chtag)
             return np.array(f[2].data["baseline"][detector_index]).flatten()
-
     def baseline_remove(self, obt, data, chtag):
             return data - np.interp(obt, self.baselines_obt, self.get_baselines(chtag))
 
@@ -36,7 +33,7 @@ base_folder = "/project/projectdirs/planck/data/mission/lfi_ops_dx11_delta/"
 baselines_file ="/global/project/projectdirs/planck/data/mission/baselines/lfi/dx11_delta/base_dx11_delta_%03d_full.fits"
 freq = 70
 
-for od in range(700, 1604+1):
+for od in range(91, 269+1):
     print "*" * 30 + str(od) + "*" * 30
     matching_files = glob(base_folder + "%04d/?%03d-*-R-*.fits" % (od, freq)) 
     assert len(matching_files) == 1, "More than one file for OD %d, freq %d, %s" % (od, freq, str(matching_files))
