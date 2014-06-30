@@ -42,7 +42,8 @@ def export_od(od, freq):
     fits_file = pyfits.open(matching_files[0])
     pnt = DiskPointing(od, freq)
 
-    fields = ['od', 'ring', 'glon', 'glat', 'psi', 'healpix_1024', 'tsky', 'dipole', 'utc']
+    #fields = ['od', 'ring', 'glon', 'glat', 'psi', 'healpix_1024', 'tsky', 'dipole', 'utc']
+    fields = ['glon', 'glat', 'psi', 'healpix_2048', 'tsky', 'utc', 'sso']
 
     from dipole import Dipole
     dip = Dipole(obt=fits_file["OBT"].data["OBT"]/2**16, type="total") 
@@ -61,14 +62,15 @@ def export_od(od, freq):
     
             data=np.zeros(n_good_data,dtype={
                     'names':fields,
-                    'formats':['int64','int64','float64','float64','float64','int64','float64','float64','int64']
+                    #'formats':['int64','int64','float64','float64','float64','int64','float64','float64','int64']
+                    'formats':['float32','float32','float32','int32','float32','float64','u1']
                                             })
     
             print "timing"
-            data["od"] = od
+            #data["od"] = od
             obt = fits_file["OBT"].data["OBT"][good_data]/2**16
-            data["utc"] = obt2utc(obt)
-            data["ring"] = 0
+            data["utc"] = float(obt2utc(obt))
+            #data["ring"] = 0
     
             print "pointing"
             ch_pnt = ch if ch.arm == "M" else ch.pair
@@ -83,14 +85,17 @@ def export_od(od, freq):
                 data['psi'] -= np.radians(ch_pnt.get_instrument_db_field("PSI_POL"))
                 data['psi'][data['psi'] < - np.pi] += 2*np.pi
 
-            data['healpix_1024'] = hp.ang2pix(1024, theta[good_data], phi[good_data])
+            data['healpix_2048'] = hp.ang2pix(2048, theta[good_data], phi[good_data])
     
-            print "dipole"
-            data['dipole'] = dip.get_4piconv_dx10(ch, theta, phi, psi)[good_data]
+            #print "dipole"
+            #data['dipole'] = dip.get_4piconv_dx10(ch, theta, phi, psi)[good_data]
     
             print "dipole-removed baseline-removed data"
             data['tsky'] = madam_baselines.baseline_remove(obt, fits_file[ch.tag].data[ch.tag][good_data], ch.tag)
             output_h5.create_dataset("%03d-%s" % (freq, ch), data=data, compression='lzf')
+
+            # TODO: Add actual solar system object flag?
+            data['sso']=0
     
             print "attributes"
             output_h5.attrs['PROCVER']  = 'DX11D'
