@@ -49,7 +49,7 @@ def export_od(od, freq):
 
     madam_baselines = MadamBaselines(baselines_file % freq)
 
-    for ch in lfi.f[freq].ch[:1]:
+    for ch in lfi.f[freq].ch:
 
         output_folder = "out/"
         output_filename = "%03d-%s_%04d.hdf5" % (freq, ch, od)
