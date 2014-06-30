@@ -64,37 +64,46 @@ def export_od(od, freq):
                     'formats':['int64','int64','float64','float64','float64','int64','float64','float64','int64']
                                             })
     
-            # timing
+            print "timing"
             data["od"] = od
             obt = fits_file["OBT"].data["OBT"][good_data]/2**16
             data["utc"] = obt2utc(obt)
             data["ring"] = 0
     
-            # pointing
-            theta, phi, psi = pnt.get_3ang(ch)
+            print "pointing"
+            ch_pnt = ch if ch.arm == "M" else ch.pair
+            theta, phi, psi = pnt.get_3ang(ch_pnt)
             data['glon'] =      np.degrees(phi[good_data])
             data['glat'] = 90 - np.degrees(theta[good_data])
             data['psi']  =      np.degrees(psi[good_data])
+            if ch.arm == "S":
+                # S is using the same pointing as M, so also the same psi,
+                # to recover the S psi, we remove the M PSI_POL angle (~90 deg) which
+                # was added by the pointing code
+                data['psi'] -= np.radians(ch_pnt.get_instrument_db_field("PSI_POL"))
+                data['psi'][data['psi'] < - np.pi] += 2*np.pi
+
             data['healpix_1024'] = hp.ang2pix(1024, theta[good_data], phi[good_data])
     
-            # dipole
+            print "dipole"
             data['dipole'] = dip.get_4piconv_dx10(ch, theta, phi, psi)[good_data]
     
-            # tsky (LFI data are already dipoleremoved
+            print "dipole-removed baseline-removed data"
             data['tsky'] = madam_baselines.baseline_remove(obt, fits_file[ch.tag].data[ch.tag][good_data], ch.tag)
             output_h5.create_dataset("%03d-%s" % (freq, ch), data=data, compression='lzf')
     
-            # attributes
+            print "attributes"
             output_h5.attrs['PROCVER']  = 'DX11D'
             output_h5.attrs['TELESCOP'] = 'PLANCK'
             output_h5.attrs['INSTRUME'] = 'LFI'
-            output_h5.attrs['DETNAM']   = ch
+            output_h5.attrs['DETNAM']   = ch.tag
             output_h5.attrs['FREQ']     = "%03d" % freq
             output_h5.attrs['OBJECT']   = 'MISSION OPERATIONAL DAY '+str(od)
             output_h5.attrs['FILENAME'] = output_filename
             output_h5.attrs['TIMEZERO'] = '1958-01-01z00:00'
 
     fits_file.close()
+    print "/" * 30 + str(od) + "/" * 30
 
 if __name__ == "__main__":
     # Run as script with od and frequency arguments
