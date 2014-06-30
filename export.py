@@ -94,6 +94,8 @@ def export_od(od, freq):
             output_h5.attrs['FILENAME'] = output_filename
             output_h5.attrs['TIMEZERO'] = '1958-01-01z00:00'
 
+    fits_file.close()
+
 if __name__ == "__main__":
     # Run as script with od and frequency arguments
     export_od(int(sys.argv[1]), int(sys.argv[2]))
