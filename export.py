@@ -34,7 +34,6 @@ def export_od(od, freq):
 
     base_folder = "/project/projectdirs/planck/data/mission/lfi_ops_dx11_delta/"
     baselines_file ="/global/project/projectdirs/planck/data/mission/baselines/lfi/dx11_delta/base_dx11_delta_%03d_full.fits"
-    freq = 70
 
     print "*" * 30 + str(od) + "*" * 30
     matching_files = glob(base_folder + "%04d/?%03d-*-R-*.fits" % (od, freq)) 
